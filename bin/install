@@ -29,6 +29,16 @@ get_maven() {
 
 	local major
 	major=$(echo "$version" | cut -d '.' -f 1)
+
+	if [ -n "$MAVEN_MIRROR" ]; then
+		local mirror_url="$MAVEN_MIRROR/maven-$major/$version/binaries/apache-maven-$version-bin.tar.gz"
+		if [ "$(download_file "$mirror_url" "$destdir/$version.tar.gz")" -eq 0 ]; then
+			return 0
+		else
+			echo "Warn: Failed to download from MAVEN_MIRROR=$MAVEN_MIRROR, falling back to official sources..."
+		fi
+	fi
+
 	local main_url="https://dlcdn.apache.org/maven/maven-$major/$version/binaries/apache-maven-$version-bin.tar.gz"
 	local archive_url="https://archive.apache.org/dist/maven/maven-$major/$version/binaries/apache-maven-$version-bin.tar.gz"
 
